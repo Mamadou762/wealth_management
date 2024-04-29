@@ -1,0 +1,1 @@
+web: gunicorn wealth_management.wsgi
