@@ -1,0 +1,59 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="Responsive Admin &amp; Dashboard Template based on Bootstrap 5">
+	<meta name="author" content="AdminKit">
+	<meta name="keywords" content="adminkit, bootstrap, bootstrap 5, admin, dashboard, template, responsive, css, sass, html, theme, front-end, ui kit, web">
+
+	<link rel="shortcut icon" href="img/icons/icon-48x48.png" />
+
+	<title>{% block page_title %}{% endblock page_title %} | W-Management</title>
+
+	{% block app_styles %}
+	{% endblock app_styles %}
+
+	<style>
+		.input-with-bottom-line {
+		  border: none;
+		  border-radius: 0;
+		  border-bottom: 1px solid #ccc;
+		}
+	</style>
+
+	<link href="{% static 'backendapp/css/plugins/bootstrap.min.css' %}" rel="stylesheet">
+	<link href="{% static 'backendapp/css/app.css' %}" rel="stylesheet" defer>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+	<div class="wrapper">
+		{% include 'backendapp/includes/sidebar.html' %}
+
+		<div class="main">
+			{% include 'backendapp/includes/header.html' %}
+
+			<main class="content">
+				{% block main_content %}
+				
+				{% endblock main_content %}
+			</main>
+
+			{% include 'backendapp/includes/footer.html' %}
+		</div>
+	</div>
+
+	<script src="{% static 'backendapp/js/app.js' %}" defer></script>
+	<script src="{% static 'backendapp/plugins/jquery.min.js' %}"></script>
+	<script src="{% static 'backendapp/plugins/sweetalert2/sweetalert2.all.min.js' %}"></script>
+
+	{% block app_scripts %}
+	{% endblock app_scripts %}
+</body>
+
+</html>

@@ -1,0 +1,294 @@
+{% extends 'backendapp/base.html' %}
+
+{% load static %}
+
+
+{% block app_styles %}
+<style>
+    .icon-container {
+        height: 250px;
+        padding: 10px;
+    }
+
+    .icon-container > div {
+        margin: 0 10px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .icon-container > div:hover {
+        cursor: pointer;
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .icon-container > div > .feather {
+        margin: 0 auto;
+        width: 30px;
+        height: 30px;
+    }
+
+    .icon-container > div > span {
+        display: block;
+    }
+</style>
+{% endblock app_styles %}
+
+
+{% block main_content %}
+<div class="container-fluid p-0">
+    <div class="mb-3">
+        <h1 class="h3 d-inline align-middle">
+            Nouvelle catégorie <i class="align-middle" data-feather="plus-circle"></i>
+        </h1>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex flex-row-reverse">
+            <a class="btn btn-primary" href="{% url 'categories' %}">
+                <i class="align-middle" data-feather="list"></i>
+                Liste des catégories
+                <i class="align-middle" data-feather="chevrons-right"></i>
+            </a>
+        </div>
+
+        <div class="dropdown-divider"></div>
+
+        {% include 'backendapp/partials/messages.html' %}
+
+        <div class="card-body">
+            <form id="category-form" method="post" action="{% url 'category-update' category.pk %}">
+                {% csrf_token %}
+
+                <input type="hidden" name="_method" value="PUT">
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_name">Nom:</label>
+                        {{ form.name }}
+                    </div>
+        
+                    <div class="col-md-6 mb-3">
+                        <label for="id_type">Type de catégorie:</label>
+                        {{ form.type }}
+                    </div>
+    
+                    <div class="mb-3 w-100">
+                        <label for="id_description">Description:</label>
+                        {{ form.description }}
+                    </div>
+                    
+                    <div class="d-flex flex-wrap shadow border icon-container overflow-auto">
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="activity"></i> <span class="align-middle">activity</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="airplay"></i> <span class="align-middle">airplay</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="anchor"></i> <span class="align-middle">anchor</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="award"></i> <span class="align-middle">award</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="battery-charging"></i> <span class="align-middle">battery-charging</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="bell"></i> <span class="align-middle">bell</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="book"></i> <span class="align-middle">book</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="calendar"></i> <span class="align-middle">calendar</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="camera"></i> <span class="align-middle">camera</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="circle"></i> <span class="align-middle">circle</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="clipboard"></i> <span class="align-middle">clipboard</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="clock"></i> <span class="align-middle">clock</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="cloud"></i> <span class="align-middle">cloud</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="lock"></i> <span class="align-middle">lock</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="credit-card"></i> <span class="align-middle">credit-card</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="edit"></i> <span class="align-middle">edit</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="film"></i> <span class="align-middle">film</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="heart"></i> <span class="align-middle">heart</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="sun"></i> <span class="align-middle">sun</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="mic"></i> <span class="align-middle">mic</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="activity"></i> <span class="align-middle">activity</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="airplay"></i> <span class="align-middle">airplay</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="anchor"></i> <span class="align-middle">anchor</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="award"></i> <span class="align-middle">award</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="battery-charging"></i> <span class="align-middle">battery-charging</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="bell"></i> <span class="align-middle">bell</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="book"></i> <span class="align-middle">book</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="calendar"></i> <span class="align-middle">calendar</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="camera"></i> <span class="align-middle">camera</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="circle"></i> <span class="align-middle">circle</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="clipboard"></i> <span class="align-middle">clipboard</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="clock"></i> <span class="align-middle">clock</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="cloud"></i> <span class="align-middle">cloud</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="lock"></i> <span class="align-middle">lock</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="credit-card"></i> <span class="align-middle">credit-card</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="edit"></i> <span class="align-middle">edit</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="film"></i> <span class="align-middle">film</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="heart"></i> <span class="align-middle">heart</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="sun"></i> <span class="align-middle">sun</span>
+                        </div>
+                        <div class="mb-2">
+                            <i class="align-middle me-2" data-feather="mic"></i> <span class="align-middle">mic</span>
+                        </div>
+                    </div>
+
+                    {{ form.icon }}
+                </div>
+
+                <div class="d-flex flex-row-reverse">
+                    <button type="submit" class="btn btn-primary btn-lg">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock main_content %}
+
+
+{% block app_scripts %}
+<script src="{% static 'backendapp/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'backendapp/plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script src="{% static 'backendapp/plugins/jquery-validation/localization/messages_fr.min.js' %}"></script>
+
+<script>
+    let selectedIcon = ""
+
+    $('.icon-container > div').click(function () {
+        if (selectedIcon !== "") {
+            $('.icon-container').children().each(function (index) {
+                if ($(this).children()['1'].innerHTML === selectedIcon) {
+                    $(this).css({'background-color': 'initial', 'color': '#000'})
+                }
+            })
+        }
+
+        $(this).css({'background-color': '#ccc', 'color': '#fff'})
+
+        selectedIcon = $(this).children().text()
+        $("#id_icon").val(selectedIcon)
+    })
+</script>
+
+<script>
+    $(document).ready(function() {
+        $.validator.setDefaults({
+            submitHandler: function(form) {
+                confirmationDialog(form)
+            }
+        });
+
+        $( "#category-form" ).validate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 3
+                },
+                type: "required",
+                icon: "required",
+                description: "required"
+            },
+            errorElement: "em",
+            errorPlacement: function (error, element) {
+                element.addClass('is-invalid')
+
+                if ( element.prop( "type" ) === "checkbox" ) {
+                    error.insertAfter(element.parent( "label" ));
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            success: function (label, element) {
+                $(element).removeClass('is-invalid')
+                $(element).addClass('is-valid')
+            }
+        });
+    })
+</script>
+
+<script>
+    function confirmationDialog(form) {
+        Swal.fire({
+            title: "Veuillez confirmer ?",
+            text: "Voulez-vous vraiment effectuez cette modification...",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            cancelButtonText: "Non",
+            confirmButtonText: "Oui"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit()
+            }
+        })
+    }
+</script>
+{% endblock app_scripts %}

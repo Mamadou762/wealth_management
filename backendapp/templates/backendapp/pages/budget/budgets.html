@@ -1,0 +1,193 @@
+{% extends 'backendapp/base.html' %}
+{% load static %}
+
+{% block main_content %}
+<div class="container-fluid p-0">
+    <h1 class="h3 mb-3">Gestion des budgets</h1>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body px-4 overflow-x-auto">
+
+                    <div class="d-flex flex-row-reverse  bd-highlight mt-2 mb-5">
+                        <a class="btn btn-primary" href="{% url 'budget-create' %}">
+                            <i class="align-middle" data-feather="plus-circle"></i>
+                            Ajouter un budget
+                        </a>
+                    </div>
+
+                    {% include 'backendapp/partials/messages.html' %}
+
+                    <table class="shadow table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th class="text-center">N°#</th>
+                                <th class="text-center">Titre</th>
+                                <th class="text-center">Catégorie</th>
+                                <th class="text-center">Montant Alloué</th>
+                                <th class="text-center">Date de début</th>
+                                <th class="text-center">Date de fin</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for budget in page_obj %}
+                                <tr>
+                                    <td class="text-center">{{ budget.id }}</td>
+                                    
+                                    <td class="text-center">{{ budget.title }}</td>
+
+                                    <td class="text-center">{{ budget.category.name }}</td>
+
+                                    <td class="text-center">{{ budget.total_amount }} GNF</td>
+
+                                    <td class="text-center">{{ budget.start_at }}</td>
+
+                                    <td class="text-center">{{ budget.end_at }}</td>
+
+                                    <td class="text-center">
+                                        {% if budget.status == 0 %}
+                                            <span class="badge bg-danger">suspendu</span>
+                                        {% endif %}
+
+                                        {% if budget.status == 1 %}
+                                            <span class="badge bg-success">actif</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="budget-action" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Action
+                                            </button>
+                                            <ul class="dropdown-menu p-0" aria-labelledby="budget-action">
+                                                <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#budgetDetail{{ budget.id }}">Détails</button></li>
+                                                
+                                                <li><a class="dropdown-item" href="{% url 'budget-update' budget.id %}">Modifier</a></li>
+
+                                                <li>
+                                                    <button class="dropdown-item" onclick="updateBudgetStatusModal({{ budget.id }})">{% if budget.status == 1 %}Désactiver{% else %}Activer{% endif %}</button>
+
+                                                    <form id="delete-budget-form" method="post" action="{% url 'update-budget-status' budget.id %}">
+                                                        {% csrf_token %}
+                                                    </form>
+                                                </li>
+                                                
+                                                <li>
+                                                    <button class="dropdown-item bg-danger text-white" onclick="deleteBudgetModal({{ budget.id }})">Supprimer</button>
+
+                                                    <form id="delete-budget-form-{{ budget.id }}" method="post" action="{% url 'budget-delete' budget.id %}">
+                                                        {% csrf_token %}
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+
+
+                                    <!-- Budget Detail Modal -->
+                                    <div class="modal fade" id="budgetDetail{{ budget.id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="budgetDetailLabel{{ budget.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="budgetDetailLabel{{ budget.id }}">Description sur le budget</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <p>{{ budget.description }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">
+                                        <span class="badge bg-warning">Aucune données trouvées dans la BDD</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- pagination HTML -->
+                    <nav>
+                        <ul class="pagination pagination-sm justify-content-end">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a href="?page={{ page_obj.previous_page_number }}" class="page-link">previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a href="" class="page-link">previous</a>
+                                </li>
+                            {% endif %}
+
+                            {% for page in page_obj.paginator.page_range %}
+                                <li class="page-item {% if page_obj.number == page %}active" aria-current="page"{% endif %}">
+                                    <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                                </li>
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a href="?page={{ page_obj.next_page_number }}" class="page-link">next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a href="" class="page-link">next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    <!-- END pagination HTML -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main_content %}
+
+
+{% block app_scripts %}
+<script>
+    function updateBudgetStatusModal(budgetId) {
+        Swal.fire({
+            title: "Etes vous sûr ?",
+            text: "Confirmez si vous voulez effectuez cette action...",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            cancelButtonText: "Non",
+            confirmButtonText: "Oui"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const url = "{% url 'update-budget-status' 0 %}".replace('0', budgetId)
+                $(location).attr('href', url)
+            }
+        })
+    }
+
+    function deleteBudgetModal(budgetId) {
+        Swal.fire({
+            title: "Etes vous sûr ?",
+            text: "Confirmez si vous voulez effectuez cette action...",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            cancelButtonText: "Non",
+            confirmButtonText: "Oui"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const url = "{% url 'budget-delete' 0 %}".replace('0', budgetId)
+                $(location).attr('href', url)
+            }
+        })
+    }
+</script>
+{% endblock app_scripts %}

@@ -1,0 +1,146 @@
+{% extends 'backendapp/base.html' %}
+{% load static %}
+
+{% block app_styles %}
+<style>
+    .icon-container {
+        height: 250px;
+        padding: 10px;
+    }
+
+    .icon-container > div {
+        margin: 0 10px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .icon-container > div:hover {
+        cursor: pointer;
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .icon-container > div > .feather {
+        margin: 0 auto;
+        width: 30px;
+        height: 30px;
+    }
+
+    .icon-container > div > span {
+        display: block;
+    }
+</style>
+{% endblock app_styles %}
+
+{% block main_content %}
+<div class="container-fluid p-0">
+    <div class="mb-3">
+        <h1 class="h3 d-inline align-middle">
+            Nouveau compte <i class="align-middle" data-feather="plus-circle"></i>
+        </h1>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex flex-row-reverse">
+            <a class="btn btn-primary" href="{% url 'accounts' %}">
+                <i class="align-middle" data-feather="list"></i>
+                Liste des comptes
+                <i class="align-middle" data-feather="chevrons-right"></i>
+            </a>
+        </div>
+
+        <div class="dropdown-divider"></div>
+
+        {% include 'backendapp/partials/messages.html' %}
+
+        <div class="card-body">
+            <form id="account-form" method="post" action="{% url 'account-create' %}">
+                {% csrf_token %}
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_category">Dévise:</label>
+                        {{ form.currency }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="id_category">name:</label>
+                        {{ form.name }}
+                    </div>
+        
+                    <div class="col-md-6 mb-3">
+                        <label for="id_user">Type de compte:</label>
+                        {{ form.type }}
+                    </div>
+    
+                    <div class="col-md-6 mb-3">
+                        <label for="id_amount">Montant initial:</label>
+                        {{ form.balance }}
+                    </div>
+
+                    <div class="mb-3 w-100">
+                        <label for="id_description">Description:</label>
+                        {{ form.description }}
+                    </div>
+                </div>
+
+                <div class="d-flex flex-row-reverse">
+                    <button type="submit" class="btn btn-primary btn-lg">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock main_content %}
+
+{% block app_scripts %}
+<script src="{% static 'backendapp/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'backendapp/plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script src="{% static 'backendapp/plugins/jquery-validation/localization/messages_fr.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        $( "#account-form" ).validate( {
+            rules: {
+                currency: "required",
+                name: {
+                    required: true,
+                    minlength: 3
+                },
+                type: "required",
+                balance: {
+                    required: true,
+                    number: true
+                }
+            },
+            messages: {
+                currency: "Veuillez entrer la dévise à utiliser",
+                name: {
+                    required: "Veuillez entrer le nom du compte",
+                    minlength: "Veuillez entrer au minimum 3 caractères"
+                },
+                type: "Veuillez entrer le type du compte",
+                balance: {
+                    required: "Veuillez entrer le solde initial",
+                    number: "Veuillez entrer une valeur numérique valide"
+                }
+            },
+            errorElement: "em",
+            errorPlacement: function (error, element) {
+                // Add `has-feedback` class to the parent div.form-group
+                // in order to add icons to inputs
+                element.addClass('is-invalid')
+
+                if ( element.prop( "type" ) === "checkbox" ) {
+                    error.insertAfter(element.parent( "label" ));
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            success: function (label, element) {
+                $(element).removeClass('is-invalid')
+                $(element).addClass('is-valid')
+            }
+        } );
+    })
+</script>
+{% endblock app_scripts %}

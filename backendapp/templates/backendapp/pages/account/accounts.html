@@ -1,0 +1,190 @@
+{% extends 'backendapp/base.html' %}
+{% load static %}
+
+{% block main_content %}
+<div class="container-fluid p-0">
+    <h1 class="h3 mb-3">Gestion des accounts</h1>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body px-4 overflow-x-auto">
+
+                    <div class="d-flex flex-row-reverse  bd-highlight mt-2 mb-5">
+                        <a class="btn btn-primary" href="{% url 'account-create' %}">
+                            <i class="align-middle" data-feather="plus-circle"></i>
+                            Ajouter un compte
+                        </a>
+                    </div>
+
+                    {% include 'backendapp/partials/messages.html' %}
+
+                    <table class="shadow table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th class="text-center">N°#</th>
+                                <th class="text-center">Nom</th>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">Solde Initial</th>
+                                <th class="text-center">Solde Actuel</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for account in page_obj %}
+                                <tr>
+                                    <td class="text-center">{{ account.id }}</td>
+                                    
+                                    <td class="text-center">{{ account.name }}</td>
+
+                                    <td class="text-center">{{ account.get_type_display }}</td>
+
+                                    <td class="text-center">{{ account.balance }} GNF</td>
+
+                                    <td class="text-center">{{ account.current_balance }} {{ account.currency.code }}</td>
+
+                                    <td class="text-center">
+                                        {% if account.status == 0 %}
+                                            <span class="badge bg-danger">suspendu</span>
+                                        {% endif %}
+
+                                        {% if account.status == 1 %}
+                                            <span class="badge bg-success">actif</span>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="account-action" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Action
+                                            </button>
+                                            <ul class="dropdown-menu p-0" aria-labelledby="account-action">
+                                                <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#accountDetail{{ account.id }}">Détails</button></li>
+                                                
+                                                <li><a class="dropdown-item" href="{% url 'account-update' account.id %}">Modifier</a></li>
+
+                                                <li>
+                                                    <button class="dropdown-item" onclick="updateAccountStatusModal({{ account.id }})">{% if account.status == 1 %}Désactiver{% else %}Activer{% endif %}</button>
+
+                                                    <form id="delete-account-form" method="post" action="{% url 'update-account-status' account.id %}">
+                                                        {% csrf_token %}
+                                                    </form>
+                                                </li>
+                                                
+                                                <li>
+                                                    <button class="dropdown-item bg-danger text-white" onclick="deleteAccountModal({{ account.id }})">Supprimer</button>
+
+                                                    <form id="delete-account-form-{{ account.id }}" method="post" action="{% url 'account-delete' account.id %}">
+                                                        {% csrf_token %}
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+
+
+                                    <!-- account Detail Modal -->
+                                    <div class="modal fade" id="accountDetail{{ account.id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="accountDetailLabel{{ account.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="accountDetailLabel{{ account.id }}">Description sur le account</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <p>{{ account.description }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">
+                                        <span class="badge bg-warning">Aucune données trouvées dans la BDD</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- pagination HTML -->
+                    <nav>
+                        <ul class="pagination pagination-sm justify-content-end">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a href="?page={{ page_obj.previous_page_number }}" class="page-link">previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a href="" class="page-link">previous</a>
+                                </li>
+                            {% endif %}
+
+                            {% for page in page_obj.paginator.page_range %}
+                                <li class="page-item {% if page_obj.number == page %}active" aria-current="page"{% endif %}">
+                                    <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                                </li>
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a href="?page={{ page_obj.next_page_number }}" class="page-link">next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a href="" class="page-link">next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    <!-- END pagination HTML -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main_content %}
+
+
+{% block app_scripts %}
+<script>
+    function updateAccountStatusModal(accountId) {
+        Swal.fire({
+            title: "Etes vous sûr ?",
+            text: "Confirmez si vous voulez effectuez cette action...",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            cancelButtonText: "Non",
+            confirmButtonText: "Oui"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const url = "{% url 'update-account-status' 0 %}".replace('0', accountId)
+                $(location).attr('href', url)
+            }
+        })
+    }
+
+    function deleteAccountModal(accountId) {
+        Swal.fire({
+            title: "Etes vous sûr ?",
+            text: "Confirmez si vous voulez effectuez cette action...",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            cancelButtonText: "Non",
+            confirmButtonText: "Oui"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const url = "{% url 'account-delete' 0 %}".replace('0', accountId)
+                $(location).attr('href', url)
+            }
+        })
+    }
+</script>
+{% endblock app_scripts %}

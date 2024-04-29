@@ -1,0 +1,78 @@
+<nav id="sidebar" class="sidebar js-sidebar">
+  <div class="sidebar-content js-simplebar">
+    <a class="sidebar-brand" href="">
+      <span class="align-middle">
+        < W-Management />
+      </span>
+    </a>
+
+    <ul class="sidebar-nav mt-2">
+      <li class="sidebar-item {% if request.path == '/' %}active{% endif %}">
+        <a class="sidebar-link" href="{% url 'dashboard' %}">
+          <i class="align-middle" data-feather="sliders"></i>
+          <span class="align-middle">Tableau de bord</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item {% if '/transactions/' in request.path %}active{% endif %}">
+        <a class="sidebar-link" href="{% url 'transactions' %}">
+          <i class="align-middle" data-feather="activity"></i>
+          <span class="align-middle">Transactions</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item {% if '/transfers/' in request.path %}active{% endif %}">
+        <a class="sidebar-link" href="{% url 'transfers' %}">
+          <i class="align-middle" data-feather="repeat"></i>
+          <span class="align-middle">Transferts</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item {% if '/categories/' in request.path %}active{% endif %}">
+        <a class="sidebar-link" href="{% url 'categories' %}">
+          <i class="align-middle" data-feather="book-open"></i>
+          <span class="align-middle">Categories</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item {% if '/budgets/' in request.path %}active{% endif %}">
+        <a class="sidebar-link" href="{% url 'budgets' %}">
+          <i class="align-middle" data-feather="database"></i>
+          <span class="align-middle">Budgets</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item {% if '/accounts/' in request.path %}active{% endif %}">
+        <a class="sidebar-link" href="{% url 'accounts' %}">
+          <i class="align-middle" data-feather="briefcase"></i>
+          <span class="align-middle">Comptes</span>
+        </a>
+      </li>
+
+      <li class="sidebar-header">
+        Pramètres
+      </li>
+
+      <li class="sidebar-item {% if '/currencies/' in request.path %}active{% endif %}">
+        <a class="sidebar-link" href="{% url 'currencies' %}">
+          <i class="align-middle" data-feather="dollar-sign"></i>
+          <span class="align-middle">Dévise</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item {% if '/users/' in request.path %}active{% endif %}">
+        <a class="sidebar-link" href="{% url 'users' %}">
+          <i class="align-middle" data-feather="users"></i>
+          <span class="align-middle">Utilisateurs</span>
+        </a>
+      </li>
+
+      <li class="sidebar-item rounded bg-primary">
+        <a class="sidebar-link" href="">
+          <i class="align-middle" data-feather="power"></i>
+          <span class="align-middle">Se déconnecter</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>

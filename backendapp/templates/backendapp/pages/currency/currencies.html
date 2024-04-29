@@ -1,0 +1,292 @@
+{% extends 'backendapp/base.html' %}
+
+{% load static %}
+
+{% block main_content %}
+<div class="container-fluid p-0">
+    <h1 class="h3 mb-3">Gestion des dévises</h1>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body px-4 overflow-x-auto">
+                    <div>
+                        <form id="currency-form" method="post" action="{% url 'currencies' %}">
+                            {% csrf_token %}
+                        
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_name">Nom:</label>
+                                    {{ form.name }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_name">Code:</label>
+                                    {{ form.code }}
+                                </div>
+                                
+                                <div class="d-flex flex-row-reverse  bd-highlight mt-2">
+                                    <button type="submit" id="submit-button" class="btn btn-primary" onclick="submitCreateForm(event)">
+                                        <i class="align-middle" data-feather="plus-circle"></i>
+                                        Ajouter la dévise
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="dropdown-divider mb-5"></div>
+
+                    {% include 'backendapp/partials/messages.html' %}
+
+                    <table class="shadow table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th class="text-center">N°#</th>
+                                <th class="text-center">Code</th>
+                                <th class="text-center">Désignation</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for currency in page_obj %}
+                                <tr>
+                                    <td class="text-center">{{ currency.id }}</td>
+                                    
+                                    <td class="text-center">{{ currency.code }}</td>
+
+                                    <td class="text-center">
+                                        <span>
+                                            <i class="align-middle" data-feather="dollar-sign"></i>
+                                        </span>
+                                        {{ currency.name }}
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" id="currency-action" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Action
+                                            </button>
+                                            <ul class="dropdown-menu p-0" aria-labelledby="currency-action">                                                
+                                                <li><button class="dropdown-item"  onclick="updateCurrency({{ currency.id }})">Modifier</button></li>
+                                                
+                                                <li>
+                                                    <button class="dropdown-item bg-danger text-white" onclick="deleteCurrencyModal({{ currency.id }})">Supprimer</button>
+
+                                                    <form id="delete-currency-form-{{ currency.id }}" method="post" action="{% url 'currencies' %}">
+                                                        <input type="hidden" name="csrfmiddlewaretoken" value="">
+                                                        <input type="hidden" name="currency_id" value="{{ currency.id }}">
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <span class="badge bg-warning">Aucune données trouvées dans la BDD</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- pagination HTML -->
+                    <nav>
+                        <ul class="pagination pagination-sm justify-content-end">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a href="?page={{ page_obj.previous_page_number }}" class="page-link">previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a href="" class="page-link">previous</a>
+                                </li>
+                            {% endif %}
+
+                            {% for page in page_obj.paginator.page_range %}
+                                <li class="page-item {% if page_obj.number == page %}active" aria-current="page"{% endif %}">
+                                    <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                                </li>
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a href="?page={{ page_obj.next_page_number }}" class="page-link">next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <a href="" class="page-link">next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    <!-- END pagination HTML -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock main_content %}
+
+
+{% block app_scripts %}
+<script>
+    function submitCreateForm(event) {
+        event.preventDefault()
+        
+        const buttonLabel = $('#submit-button').text().trim()
+        const data = $('#currency-form').serialize()
+        
+        if (buttonLabel === "Ajouter la dévise") {
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'currencies' %}",
+                data: data,
+                dataType: 'json',
+                success: function (data) {
+                    const url = "{% url 'currencies' %}"
+                    $(location).attr('href', url)
+                },
+                error: function (error) {
+                    console.log(error)
+                }
+            })
+        }
+
+        if (buttonLabel === "Modifier") {
+            Swal.fire({
+                title: "Veuillez confirmer ?",
+                text: "Voulez-vous vraiment effectuez cette modification...",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                cancelButtonText: "Non",
+                confirmButtonText: "Oui"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submmitUpdateForm()
+                }
+            })
+
+            function submmitUpdateForm() {
+                $.ajax({
+                    type: 'GET',
+                    url: "{% url 'get-csrf-token' %}",
+                    success: function (data) {
+                        let token = data.csrf_token
+        
+                        const currencyId = $('#currency_id').val()
+                        const name = $('#id_name').val()
+                        const code = $('#id_code').val()
+                        
+                        console.log('id', currencyId)
+                        console.log('name', name)
+                        console.log('code', code)
+                        $.ajax({
+                            type: 'PATCH',
+                            url: "{% url 'currencies' %}" + `?currency_id=${currencyId}&name=${name}&code=${code}`,
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader('X-CSRFToken', token)
+                            },
+                            success: function (data) {
+                                const url = "{% url 'currencies' %}"
+                                $(location).attr('href', url)
+                            },
+                            error: function (error) {
+                                console.log(error)
+                            }
+                        })
+                    },
+                    error: function (error) {
+                        console.log(error)
+                    }
+                })
+            }
+        }
+    }
+
+    function updateCurrency(currencyId) {
+        $('#submit-button').html('<i class="align-middle" data-feather="edit"></i>Modifier')
+        
+        const url = {% url 'currencies' %} + `?currencyId=${currencyId}`
+
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function (data) {
+                $('[name="name"]').val(data.name)
+                $('[name="code"]').val(data.code)
+                
+                const currencyInput = $('<input>').attr('type', 'hidden').attr('name', 'currency_id').attr('id', 'currency_id').val(currencyId)
+                $('#currency-form').append(currencyInput)
+            },
+            error: function (error) {
+                console.log(error)
+            }
+        })
+    }
+    
+    function deleteCurrencyModal(currencyId) {
+        Swal.fire({
+            title: "Etes vous sûr ?",
+            text: "Confirmez si vous voulez effectuez cette action...",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            cancelButtonText: "Non",
+            confirmButtonText: "Oui"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'GET',
+                    url: "{% url 'get-csrf-token' %}",
+                    success: function (data) {
+                        let token = data.csrf_token
+
+                        const form = $(`#delete-currency-form-${ currencyId }`)
+                        $(form.children()[0]).val(token)
+
+                        data = $(`#delete-currency-form-${ currencyId }`).serialize()
+                        
+                        $.ajax({
+                            type: 'DELETE',
+                            url: "{% url 'currencies' %}" + `?currency_id=${currencyId}`,
+                            data: data,
+                            dataType: 'json',
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader('X-CSRFToken', token)
+                            },
+                            success: function (data) {
+                                const url = "{% url 'currencies' %}"
+                                $(location).attr('href', url)
+                            },
+                            error: function (error) {
+                                console.log(error)
+                            }
+                        })
+                    },
+                    error: function (error) {
+                        console.log(error)
+                    }
+                })                
+            }
+        })
+    }
+
+    function getCSRFToken() {
+        $.ajax({
+            type: 'GET',
+            url: "{% url 'get-csrf-token' %}",
+            success: function (data) {
+                return data.csrf_token
+            },
+            error: function (error) {
+                console.log(error)
+            }
+        })
+    }
+</script>
+{% endblock app_scripts %}

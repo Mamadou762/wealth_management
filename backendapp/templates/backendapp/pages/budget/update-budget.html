@@ -1,0 +1,184 @@
+{% extends 'backendapp/base.html' %}
+{% load static %}
+
+{% block app_styles %}
+<style>
+    .icon-container {
+        height: 250px;
+        padding: 10px;
+    }
+
+    .icon-container > div {
+        margin: 0 10px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .icon-container > div:hover {
+        cursor: pointer;
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .icon-container > div > .feather {
+        margin: 0 auto;
+        width: 30px;
+        height: 30px;
+    }
+
+    .icon-container > div > span {
+        display: block;
+    }
+</style>
+{% endblock app_styles %}
+
+{% block main_content %}
+<div class="container-fluid p-0">
+    <div class="mb-3">
+        <h1 class="h3 d-inline align-middle">
+            Nouveau budget <i class="align-middle" data-feather="plus-circle"></i>
+        </h1>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex flex-row-reverse">
+            <a class="btn btn-primary" href="{% url 'budgets' %}">
+                <i class="align-middle" data-feather="list"></i>
+                Liste des budgets
+                <i class="align-middle" data-feather="chevrons-right"></i>
+            </a>
+        </div>
+
+        <div class="dropdown-divider"></div>
+
+        {% include 'backendapp/partials/messages.html' %}
+
+        <div class="card-body">
+            <form id="budget-form" method="post" action="{% url 'budget-update' budget.id %}">
+                {% csrf_token %}
+
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_category">Catégorie:</label>
+                        {{ form.category }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="id_category">Titre:</label>
+                        {{ form.title }}
+                    </div>
+        
+                    <div class="col-md-6 mb-3">
+                        <label for="id_user">Montant à allouer:</label>
+                        {{ form.total_amount }}
+                    </div>
+    
+                    <div class="col-md-6 mb-3">
+                        <label for="id_amount">Date de début:</label>
+                        {{ form.start_at }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="id_amount">Date de fin:</label>
+                        {{ form.end_at }}
+                    </div>
+
+                    <div class="mb-3 w-100">
+                        <label for="id_description">Description:</label>
+                        {{ form.description }}
+                    </div>
+                </div>
+
+                <div class="d-flex flex-row-reverse">
+                    <button type="submit" class="btn btn-primary btn-lg">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock main_content %}
+
+{% block app_scripts %}
+<script src="{% static 'backendapp/plugins/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'backendapp/plugins/jquery-validation/additional-methods.min.js' %}"></script>
+<script src="{% static 'backendapp/plugins/jquery-validation/localization/messages_fr.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        $.validator.setDefaults({
+            submitHandler: function(form) {
+                confirmationDialog(form)
+            }
+        });
+
+        $( "#budget-form" ).validate( {
+            rules: {
+                title: "required",
+                category: "required",
+                total_amount: {
+                    required: true,
+                    number: true
+                },
+                start_at: {
+                    required: true,
+                    dateFR: true
+                },
+                end_at: {
+                    required: true,
+                    dateFR: true
+                }
+            },
+            messages: {
+                title: "Veuillez entrer un titre",
+                category: "Veuillez sélectionner une catégorie",
+                total_amount: {
+                    required: "Veuillez entrer un montant",
+                    number: "Veuillez entrer une valeur numérique valide"
+                },
+                start_at: {
+                    required: "Veuillez sélectionner la date de début",
+                    dateISO: "Veuillez entrer une date valide au format YYYY-MM-DD"
+                },
+                end_at: {
+                    required: "Veuillez sélectionner la date de fin",
+                    dateISO: "Veuillez entrer une date valide au format YYYY-MM-DD"
+                }
+            },
+            errorElement: "em",
+            errorPlacement: function (error, element) {
+                // Add `has-feedback` class to the parent div.form-group
+                // in order to add icons to inputs
+                element.addClass('is-invalid')
+
+                if ( element.prop( "type" ) === "checkbox" ) {
+                    error.insertAfter(element.parent( "label" ));
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            success: function (label, element) {
+                $(element).removeClass('is-invalid')
+                $(element).addClass('is-valid')
+            }
+        } );
+    })
+</script>
+
+<script>
+    function confirmationDialog(form) {
+        Swal.fire({
+            title: "Veuillez confirmer ?",
+            text: "Voulez-vous vraiment effectuez cette modification...",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            cancelButtonText: "Non",
+            confirmButtonText: "Oui"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit()
+            }
+        })
+    }
+</script>
+{% endblock app_scripts %}
